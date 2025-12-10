@@ -31,20 +31,20 @@ public class collocation implements WritableComparable<collocation>{
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        decade = in.readUTF();                
-        word1 = in.readUTF();                
-        word2 = in.readUTF();                
+        decade.readFields(in);                
+        word1.readFields(in);                
+        word2.readFields(in);                
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeUTF(decade);
-        out.writeUTF(word1);
-        out.writeUTF(word2);     
+        decade.write(out);
+        word1.write(out);
+        word2.write(out);     
     }
 
     @Override
-    public int compareTo(DecadeKey other) {
+    public int compareTo(collocation other) {
         int cmp = this.decade.compareTo(other.decade);
         if (cmp != 0) {
             return cmp;

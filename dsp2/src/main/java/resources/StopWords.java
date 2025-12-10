@@ -1,16 +1,16 @@
-package main.resources;
+package resources;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class stopsWords {
+public class StopWords {
     private static StopWords instance = null;
     private Set<String> englishStopSet;
     private Set<String> hebrewStopSet;
 
     private StopWords() {
-        stopWordSet = new HashSet<>();
+        englishStopSet = new HashSet<>();
         
         // --- A. Hardcoded List (Easy for testing) ---
         String[] englishStopArray = """
@@ -333,7 +333,7 @@ public class stopsWords {
             yours
             yourself
             yourselves
-            """.split('\n');
+            """.split("\n");
         englishStopSet.addAll(Arrays.asList(englishStopArray));
         
         String[] hebrewStopArray = """
@@ -458,7 +458,7 @@ public class stopsWords {
             ר
             פעמים
             נעשה
-            ן
+            ו
             ממנו
             מלא
             מזה
@@ -487,7 +487,7 @@ public class stopsWords {
             או
             אבל
             א
-            """.split('\n');
+            """.split("\n");
 
             hebrewStopSet.addAll(Arrays.asList(hebrewStopArray));
         

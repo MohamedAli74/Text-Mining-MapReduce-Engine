@@ -1,33 +1,31 @@
-package main.java.dsp2;
+package dsp2;
 
 import java.io.IOException;
-import java.util.HashSet;
 
-import org.apache.hadoop.io.LongWriteable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import com.yourname.collocation.writables.DecadeKey;
 
 import writables.collocation;
-import resources.stopsWords;
+import resources.StopWords;
 
 
 public class job1 {
     
 
-    public static class job1Mapper extends Mapper<LongWriteable, Text, collocation, LongWriteable>{//<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
+    public static class job1Mapper extends Mapper<LongWritable, Text, collocation, LongWritable>{//<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
         StopWords stopsWords;
         
         @Override
-        protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context)
+        protected void setup(Context context)
         throws IOException,
         InterruptedException{
             stopsWords = StopWords.getInstance();
         }
         
         @Override
-        protected void map(LongWriteable lineId ,Text line , org.apache.hadoop.mapreduce.Mapper.Context context)
+        protected void map(LongWritable lineId ,Text line , Context context)
             throws IOException,
             InterruptedException{
                 //line format - ngram TAB year TAB match_count TAB volume_count NEWLINE
@@ -40,11 +38,11 @@ public class job1 {
                 if (words.length != 2) {
                     return;
                 }
-                if(stopsWords.isStopWord(word[0]) | stopsWords.isStopWord(word[1]))return;
+                if(stopsWords.isStopWord(words[0]) | stopsWords.isStopWord(words[1]))return;
                 collocation key = new collocation(new Text(decade) ,new Text(words[0]), new Text(words[1]));
                 // collocation key2 = new collocation(new Text(decade) ,new Text(words[0]), new Text("*"));
                 // collocation key3 = new collocation(new Text(decade) ,new Text(words[1]), new Text("*"));
-                LongWriteable value = new LongWriteable(Long.parseLong(LineParts[2]));
+                LongWritable value = new LongWritable(Long.parseLong(lineParts[2]));
                 context.write(key,value);
             }
             
@@ -61,15 +59,16 @@ public class job1 {
     
     
 
-    public static class job1Reducer extends Reducer<collocation, LongWriteable, collocation, LongWriteable>{//<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
+    public static class job1Reducer extends Reducer<collocation, LongWritable, collocation, LongWritable>{//<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
         @Override
-        void reduce(collocation collocation, Iterable<LongWriteable> counts, org.apache.hadoop.mapreduce.Reducer.Context context)
-            throws IOException{
+        public void reduce(collocation collocation, Iterable<LongWritable> counts, Context context)
+            throws IOException,
+            InterruptedException{
                 long sum = 0;
-                for(LongWriteable count : counts)
+                for(LongWritable count : counts)
                     sum += count.get();
-                context.write(collocation, new LongWriteable(sum));
-                context.getCounter("DecadeCounts", key.getDecade().toString()).increment(sum);
+                context.write(collocation, new LongWritable(sum));
+                context.getCounter("DecadeCounts", collocation.getDecade().toString()).increment(sum);
             }
     }
 

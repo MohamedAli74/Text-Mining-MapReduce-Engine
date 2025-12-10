@@ -1,13 +1,11 @@
-package main.java.dsp2;
+package dsp2;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import com.yourname.collocation.writables.DecadeKey;
 import org.apache.hadoop.mapreduce.Partitioner;
 
 import writables.collocation;
@@ -23,7 +21,7 @@ public class job2 {
         // InterruptedException{}
         
         @Override
-        protected void map(collocation key ,LongWritable c12 , org.apache.hadoop.mapreduce.Mapper.Context context)
+        protected void map(collocation key ,LongWritable c12 , Context context)
             throws IOException,
             InterruptedException{
                 outputKey.set(key.getDecade(), key.getWord1(), star);
@@ -62,7 +60,7 @@ public class job2 {
         private String currentWord1 = "";
 
         @Override
-        protected void reduce(collocation key, Iterable<LongWritable> values, org.apache.hadoop.mapreduce.Mapper.Context context)
+        protected void reduce(collocation key, Iterable<LongWritable> values, Context context)
             throws IOException,
             InterruptedException{
             String decade = key.getDecade().toString();
