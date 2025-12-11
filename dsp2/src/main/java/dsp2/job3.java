@@ -7,6 +7,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 
+import dsp2.likelihoodRatio;
 import writables.collocation;
 
 public class job3 {
@@ -39,7 +40,6 @@ public class job3 {
     }
 
     public static class job3Reducer extends Reducer<collocation, Text, collocation, Text>{
-        private Text outputValue = new Text();
         // Variables to hold state between iterations
         private long currentC2 = 0;
         private String currentDecade = "";
@@ -70,16 +70,20 @@ public class job3 {
             else{
                 for (Text val : values) {
                     // Value is "c12,c1"
-                    String valStr = val.toString();
-                    
-                    // Output Value: "c12,c1,c2"
-                    outputValue.set(valStr + "," + currentC2);
+                    String[] valParts = val.toString().split(",");
+                    long c12 = Long.parseLong(valParts[0]);
+                    long c1 = Long.parseLong(valParts[1]);
+                    long N = context.getConfiguration().getLong("N_" + decade, -1);
+                    if (N == -1) {
+                        throw new RuntimeException("Error: Missing N for decade " + decade);
+                    }
+                    double value = likelihoodRatio.get(c1, currentC2, c12, N);
                     
                     //Swap the key back for display
                     collocation finalKey = new collocation();
                     finalKey.set(new Text(decade), key.getWord2(), key.getWord1());
                     
-                    context.write(finalKey, outputValue);
+                    context.write(finalKey, new Text(value+""));
                 }
             }
             //output: (decade w1 w2), "c12,c1,c2"

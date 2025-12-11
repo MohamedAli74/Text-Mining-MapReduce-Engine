@@ -1,9 +1,9 @@
 package dsp2;
 public class likelihoodRatio {
-    private double L(double k, double n, double x){
+    private static double L(double k, double n, double x){
         return Math.pow(x, k) * Math.pow(1-x, n-k);
     }
-    private double logL(double k, double n, double x){
+    private static double logL(double k, double n, double x){
         return Math.log(L(k, n, x));
     }
     /**
@@ -14,7 +14,7 @@ public class likelihoodRatio {
      * @param N the total number of words in the corpus
      * @return log likelihood ratio of the collocation 
      */
-    public double get(long c1, long c2, long c12, long N){
+    public static double get(long c1, long c2, long c12, long N){
         double p = (double) c2 / N;
         double p1 = (double) c12/c1;
         double p2 = (double) (c2-c12)/(N-c1);
