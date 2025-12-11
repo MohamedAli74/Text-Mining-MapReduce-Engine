@@ -8,7 +8,7 @@ import org.apache.hadoop.io.WritableComparable;
 
 public class collocation implements WritableComparable<collocation>{
     
-    private Text decade;//TODO: might need to change it
+    private Text decade;
     private Text word1;
     private Text word2;
 

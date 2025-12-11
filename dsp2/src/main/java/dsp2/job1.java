@@ -40,21 +40,10 @@ public class job1 {
                 }
                 if(stopsWords.isStopWord(words[0]) | stopsWords.isStopWord(words[1]))return;
                 collocation key = new collocation(new Text(decade) ,new Text(words[0]), new Text(words[1]));
-                // collocation key2 = new collocation(new Text(decade) ,new Text(words[0]), new Text("*"));
-                // collocation key3 = new collocation(new Text(decade) ,new Text(words[1]), new Text("*"));
                 LongWritable value = new LongWritable(Long.parseLong(lineParts[2]));
                 context.write(key,value);
             }
             
-        // @Override
-        // protected void cleanup(org.apache.hadoop.mapreduce.Mapper.Context context)
-        // throws IOException,
-        // InterruptedException{}
-        
-        // @Override
-        // public void run(org.apache.hadoop.mapreduce.Mapper.Context context)
-        // throws IOException,
-        // InterruptedException{}
     }
     
     

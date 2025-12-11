@@ -15,11 +15,6 @@ public class job2 {
         private collocation outputKey = new collocation();
         private Text star = new Text("*");
 
-        // @Override
-        // protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context)
-        // throws IOException,
-        // InterruptedException{}
-        
         @Override
         protected void map(collocation key ,LongWritable c12 , Context context)
             throws IOException,
@@ -30,15 +25,6 @@ public class job2 {
                 context.write(key, c12);// (word1, word2)
             }
             
-        // @Override
-        // protected void cleanup(org.apache.hadoop.mapreduce.Mapper.Context context)
-        // throws IOException,
-        // InterruptedException{}
-        
-        // @Override
-        // public void run(org.apache.hadoop.mapreduce.Mapper.Context context)
-        // throws IOException,
-        // InterruptedException{}
     }
 
 
