@@ -2,12 +2,12 @@ package dsp2;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import dsp2.likelihoodRatio;
 import writables.collocation;
 
 public class job3 {
@@ -39,7 +39,7 @@ public class job3 {
         }
     }
 
-    public static class job3Reducer extends Reducer<collocation, Text, collocation, Text>{
+    public static class job3Reducer extends Reducer<collocation, Text, collocation, DoubleWritable>{
         // Variables to hold state between iterations
         private long currentC2 = 0;
         private String currentDecade = "";
@@ -83,10 +83,10 @@ public class job3 {
                     collocation finalKey = new collocation();
                     finalKey.set(new Text(decade), key.getWord2(), key.getWord1());
                     
-                    context.write(finalKey, new Text(value+""));
+                    context.write(finalKey, new DoubleWritable(value));
                 }
             }
-            //output: (decade w1 w2), "c12,c1,c2"
+            //output: (decade w1 w2), raio(55.2)
         }
     }
     
