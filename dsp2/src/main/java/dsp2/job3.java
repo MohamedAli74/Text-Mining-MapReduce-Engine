@@ -22,7 +22,7 @@ public class job3 {
                 outputKey.set(key.getDecade(), key.getWord2(), star);
 
                 context.write(outputKey, new Text(value.toString().split(",")[0]));// (word2, *) "c12"
-                key.set(key.getDecade(),key.getWord2(),key.getWord2());
+                key.set(key.getDecade(),key.getWord2(),key.getWord1());
                 context.write(key, value);// (word2, word1) "c12,c1"
             }
             

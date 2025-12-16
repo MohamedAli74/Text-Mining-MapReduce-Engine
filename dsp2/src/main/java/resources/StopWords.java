@@ -11,6 +11,7 @@ public class StopWords {
 
     private StopWords() {
         englishStopSet = new HashSet<>();
+        hebrewStopSet = new HashSet<>();
         
         // --- A. Hardcoded List (Easy for testing) ---
         String[] englishStopArray = """
