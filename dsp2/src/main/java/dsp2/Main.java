@@ -32,19 +32,16 @@ public class Main {
     }
 
     private static void loadDecadeCountersIntoConf(Job finishedJob1, Configuration conf) throws Exception {
-        // Job3 reducer reads N like: context.getConfiguration().getLong("N_" + decade, -1)
         Counters counters = finishedJob1.getCounters();
         CounterGroup g = counters.getGroup("DecadeCounts");
         for (Counter c : g) {
-            String decade = c.getName();  // e.g. "1990"
-            long N = c.getValue();        // your summed counts
+            String decade = c.getName();  
+            long N = c.getValue();        
             conf.setLong("N_" + decade, N);
         }
     }
 
     public static void main(String[] args) throws Exception {
-        // Usage:
-        // hadoop jar your.jar dsp2.Main <job1_input> <output_base> [reducers]
         if (args.length < 2) {
             System.err.println("Usage: dsp2.Main <job1_input> <output_base> [reducers]");
             System.exit(1);
@@ -61,14 +58,13 @@ public class Main {
         Path out3 = new Path(outBase + "/job3_out");
         Path out4 = new Path(outBase + "/job4_out");
 
-        // clean outputs (otherwise Hadoop fails if output exists)
+        // clean outputs 
         deleteIfExists(conf, out1);
         deleteIfExists(conf, out2);
         deleteIfExists(conf, out3);
         deleteIfExists(conf, out4);
 
-        // -------------------------
-        // Job 1: Text -> SequenceFile<collocation, LongWritable>
+        // Job 1
         // -------------------------
         Job j1 = Job.getInstance(conf, "job1 - build (decade,w1,w2)->c12");
         j1.setJarByClass(Main.class);
@@ -82,7 +78,6 @@ public class Main {
         j1.setOutputKeyClass(collocation.class);
         j1.setOutputValueClass(LongWritable.class);
 
-        // IMPORTANT: so Job2 can read collocation/LongWritable as real writables
         j1.setOutputFormatClass(SequenceFileOutputFormat.class);
 
         j1.setNumReduceTasks(reducers);
@@ -98,9 +93,8 @@ public class Main {
         // Put N per decade into conf for Job3 (from Job1 counters)
         loadDecadeCountersIntoConf(j1, conf);
 
-        // -------------------------
-        // Job 2: SequenceFile<collocation, LongWritable> -> SequenceFile<collocation, Text("c12,c1")>
-        // -------------------------
+        // Job 2
+
         Job j2 = Job.getInstance(conf, "job2 - add c1 to each (decade,w1,w2)");
         j2.setJarByClass(Main.class);
 
@@ -127,8 +121,7 @@ public class Main {
             System.exit(3);
         }
 
-        // -------------------------
-        // Job 3: SequenceFile<collocation, Text("c12,c1")> -> SequenceFile<collocation, DoubleWritable(ratio)>
+        // Job 3: Add c2 and compute likelihood ratio
         // -------------------------
         Job j3 = Job.getInstance(conf, "job3 - add c2 and compute ratio");
         j3.setJarByClass(Main.class);
@@ -156,8 +149,7 @@ public class Main {
             System.exit(4);
         }
 
-        // -------------------------
-        // Job 4: SequenceFile<collocation, DoubleWritable> -> Text output of top 100 per decade
+        // Job 4: Top 100 per decade
         // -------------------------
         Job j4 = Job.getInstance(conf, "job4 - top100 per decade");
         j4.setJarByClass(Main.class);
@@ -167,7 +159,7 @@ public class Main {
         j4.setPartitionerClass(job4.Job4Partitioner.class);
         j4.setReducerClass(job4.Job4Reducer.class);
 
-        // Group by decade only (so reducer runs once per decade)
+        
         j4.setGroupingComparatorClass(job4.DecadeGroupingComparator.class);
 
         j4.setMapOutputKeyClass(DoublePair.class);
