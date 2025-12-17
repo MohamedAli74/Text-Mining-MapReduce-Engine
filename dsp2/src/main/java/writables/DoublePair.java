@@ -83,21 +83,21 @@ public class DoublePair implements WritableComparable<DoublePair> {
     }
 
     @Override
-public String toString() {
-    return decade.toString() + "\t" + score.get();
-}
+    public String toString() {
+        return decade.toString() + "\t" + score.get();
+    }
 
-@Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof DoublePair)) return false;
-    DoublePair other = (DoublePair) o;
-    return decade.equals(other.decade) && score.equals(other.score);
-}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DoublePair)) return false;
+        DoublePair other = (DoublePair) o;
+        return decade.equals(other.decade) && score.equals(other.score);
+    }
 
-@Override
-public int hashCode() {
-    return 163 * decade.hashCode() + score.hashCode();
-}
+    @Override
+    public int hashCode() {
+        return 163 * decade.hashCode() + score.hashCode();
+    }
 
 }

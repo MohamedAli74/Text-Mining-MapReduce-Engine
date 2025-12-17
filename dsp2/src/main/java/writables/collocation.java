@@ -63,4 +63,8 @@ public class collocation implements WritableComparable<collocation>{
     public Text getWord1()  { return word1; }
     public Text getWord2()  { return word2; }
 
+    public String toString(){
+        return decade.toString() + " " + word1.toString() + " " + word2.toString();
+    }
+
 }
