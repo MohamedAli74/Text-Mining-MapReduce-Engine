@@ -1,7 +1,6 @@
 package dsp2;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
@@ -24,8 +23,10 @@ public class job4 {
         protected void map(collocation key ,DoubleWritable ratio , Context context)
             throws IOException,
             InterruptedException {
+                //DEBUGSystem.out.println("Debugging:Job4Mapper processing key: " + key.toString() + " with value: " + ratio.get());
                 DoublePair outKey = new DoublePair(key.getDecade(),ratio);
                 Text outValue = new Text(key.getWord1().toString() +","+ key.getWord2().toString());
+                //DEBUGSystem.out.println("Debugging:Job4Mapper emitting: " + outKey.toString() + " -> " + outValue.toString());
                 context.write(outKey, outValue); 
         }
     }
@@ -34,6 +35,7 @@ public class job4 {
         
         @Override
         public int getPartition(DoublePair key, Text value, int numPartitions) {
+            //DEBUGSystem.out.println("Debugging:Job4Partitioner processing key: " + key.toString() + " with value: " + value.toString());
             //only hash 'decade' to ensure all the collocations from the same decade gets to the same reducer.
             int hash = key.getDecade().toString().hashCode();
             return (hash & Integer.MAX_VALUE) % numPartitions;
@@ -64,12 +66,13 @@ public class job4 {
         public void reduce(DoublePair key, Iterable<Text> values, Context context)
             throws IOException,
             InterruptedException {
-            
+            //DEBUGSystem.out.println("Debugging:Job4Reducer processing key: " + key.toString() + " with values: " + values.toString());
             int counter = 0;
 
             for (Text val : values) {
                 if (counter < 100) {
-                context.write(key, val);
+                    //DEBUGSystem.out.println("Debugging:Job4Reducer emitting: " + key.toString() + " -> " + val.toString());
+                    context.write(key, val);
                     counter++;
                 } else {
                     return; 

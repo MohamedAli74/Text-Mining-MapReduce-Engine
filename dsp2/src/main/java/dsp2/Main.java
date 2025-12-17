@@ -18,6 +18,8 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
 import writables.DoublePair;
 import writables.collocation;
@@ -31,8 +33,8 @@ public class Main {
         }
     }
 
-    private static void loadDecadeCountersIntoConf(Job finishedJob1, Configuration conf) throws Exception {
-        Counters counters = finishedJob1.getCounters();
+    private static void loadDecadeCountersIntoConf(Job finishedJob2, Configuration conf) throws Exception {
+        Counters counters = finishedJob2.getCounters();
         CounterGroup g = counters.getGroup("DecadeCounts");
         for (Counter c : g) {
             String decade = c.getName();  
@@ -47,9 +49,10 @@ public class Main {
             System.exit(1);
         }
 
-        String inputJob1 = args[0];
-        String outBase   = args[1];
-        int reducers     = (args.length >= 3) ? Integer.parseInt(args[2]) : 2;
+        String unigramInput = args[0];
+        String bigramInput = args[1];
+        String outBase   = args[2];
+        int reducers     = (args.length >= 4) ? Integer.parseInt(args[3]) : 2;
 
         Configuration conf = new Configuration();
 
@@ -82,7 +85,7 @@ public class Main {
 
         j1.setNumReduceTasks(reducers);
 
-        FileInputFormat.addInputPath(j1, new Path(inputJob1));
+        FileInputFormat.addInputPath(j1, new Path(bigramInput));
         FileOutputFormat.setOutputPath(j1, out1);
 
         if (!j1.waitForCompletion(true)) {
@@ -90,22 +93,27 @@ public class Main {
             System.exit(2);
         }
 
-        // Put N per decade into conf for Job3 (from Job1 counters)
-        loadDecadeCountersIntoConf(j1, conf);
-
+        
         // Job 2
-
-        Job j2 = Job.getInstance(conf, "job2 - add c1 to each (decade,w1,w2)");
+        
+        Job j2 = Job.getInstance(conf, "job2 - Join c1 from Unigrams");
         j2.setJarByClass(Main.class);
+        
+        MultipleInputs.addInputPath(j2, out1,
+            SequenceFileInputFormat.class, 
+            job2.job2Mapper.class);
 
-        j2.setInputFormatClass(SequenceFileInputFormat.class);
-        j2.setMapperClass(job2.job2Mapper.class);
+        MultipleInputs.addInputPath(j2, new Path(unigramInput), // Variable from args[1]
+        TextInputFormat.class, 
+        job2.UnigramMapper.class); 
+        
+        
         j2.setPartitionerClass(job2.Job2Partitioner.class);
         j2.setReducerClass(job2.job2Reducer.class);
 
         j2.setMapOutputKeyClass(collocation.class);
         j2.setMapOutputValueClass(LongWritable.class);
-
+        
         j2.setOutputKeyClass(collocation.class);
         j2.setOutputValueClass(Text.class);
 
@@ -113,35 +121,40 @@ public class Main {
 
         j2.setNumReduceTasks(reducers);
 
-        FileInputFormat.addInputPath(j2, out1);
         FileOutputFormat.setOutputPath(j2, out2);
-
+        
         if (!j2.waitForCompletion(true)) {
             System.err.println("Job2 failed");
-            System.exit(3);
+        System.exit(3);
         }
+        // Put N per decade into conf for Job3 (from Job2 counters)
+        loadDecadeCountersIntoConf(j2, conf);
 
         // Job 3: Add c2 and compute likelihood ratio
         // -------------------------
-        Job j3 = Job.getInstance(conf, "job3 - add c2 and compute ratio");
+        Job j3 = Job.getInstance(conf, "job3 - Join c2 from Unigrams");
         j3.setJarByClass(Main.class);
 
-        j3.setInputFormatClass(SequenceFileInputFormat.class);
-        j3.setMapperClass(job3.job3Mapper.class);
+        MultipleInputs.addInputPath(j3, out2,
+            SequenceFileInputFormat.class,
+            job3.job3Mapper.class);
+            
+        MultipleInputs.addInputPath(j3, new Path(unigramInput), 
+            TextInputFormat.class, 
+            job3.UnigramMapper.class); 
+
         j3.setPartitionerClass(job3.Job3Partitioner.class);
         j3.setReducerClass(job3.job3Reducer.class);
 
         j3.setMapOutputKeyClass(collocation.class);
         j3.setMapOutputValueClass(Text.class);
 
+        // Output Configuration
         j3.setOutputKeyClass(collocation.class);
-        j3.setOutputValueClass(DoubleWritable.class);
-
+        j3.setOutputValueClass(DoubleWritable.class); // The LLR Score
         j3.setOutputFormatClass(SequenceFileOutputFormat.class);
-
         j3.setNumReduceTasks(reducers);
 
-        FileInputFormat.addInputPath(j3, out2);
         FileOutputFormat.setOutputPath(j3, out3);
 
         if (!j3.waitForCompletion(true)) {
@@ -159,7 +172,6 @@ public class Main {
         j4.setPartitionerClass(job4.Job4Partitioner.class);
         j4.setReducerClass(job4.Job4Reducer.class);
 
-        
         j4.setGroupingComparatorClass(job4.DecadeGroupingComparator.class);
 
         j4.setMapOutputKeyClass(DoublePair.class);
