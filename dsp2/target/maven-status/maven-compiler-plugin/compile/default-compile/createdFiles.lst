@@ -2,12 +2,14 @@ writables/DoublePair.class
 dsp2/job1$job1Reducer.class
 dsp2/job2.class
 dsp2/job2$job2Mapper.class
+dsp2/job3$UnigramMapper.class
 resources/StopWords.class
 dsp2/job2$job2Reducer.class
 dsp2/Main.class
 dsp2/job1$job1Mapper.class
 dsp2/job1.class
 dsp2/job4$job4Mapper.class
+dsp2/job2$UnigramMapper.class
 writables/collocation.class
 dsp2/job3$job3Reducer.class
 dsp2/job4$Job4Partitioner.class
