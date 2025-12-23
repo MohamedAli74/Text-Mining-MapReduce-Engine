@@ -13,6 +13,30 @@ import writables.collocation;
 
 public class job1 {
 
+    /**
+     * Cleans a token so it becomes ONLY letters (English or Hebrew),
+     * after removing punctuation from start/end.
+     * Returns null if invalid.
+     */
+    private static String cleanToken(String raw) {
+        if (raw == null) return null;
+
+        String w = raw.trim().toLowerCase(Locale.ROOT);
+        if (w.isEmpty()) return null;
+
+        // Remove non-letter chars from the beginning/end
+        // Keep: a-z and Hebrew block \u0590-\u05FF
+        w = w.replaceAll("^[^a-z\\u0590-\\u05FF]+", "");
+        w = w.replaceAll("[^a-z\\u0590-\\u05FF]+$", "");
+
+        if (w.length() < 2) return null;
+
+        // Must be letters only after cleaning
+        if (!w.matches("^[a-z\\u0590-\\u05FF]+$")) return null;
+
+        return w;
+    }
+
     public static class job1Mapper extends Mapper<LongWritable, Text, collocation, LongWritable> {
 
         private StopWords stopWords;
@@ -26,78 +50,57 @@ public class job1 {
         protected void map(LongWritable lineId, Text line, Context context)
                 throws IOException, InterruptedException {
 
-            // Expected input format (Google Ngrams style):
-            // "<w1 w2>\t<year>\t<count>\t<...optional...>"
+            // Expected format (Google Ngrams text):
+            // <ngram>\t<year>\t<count>\t<...optional...>
             String[] parts = line.toString().split("\t");
             if (parts.length < 3) return;
 
-            String gram = parts[0].trim();
-            String yearStr = parts[1].trim();
-            String countStr = parts[2].trim();
-
+            // year -> decade
             int year;
             try {
-                year = Integer.parseInt(yearStr);
+                year = Integer.parseInt(parts[1].trim());
             } catch (NumberFormatException e) {
+                return;
+            }
+            int decadeInt = (year / 10) * 10;
+            String decade = Integer.toString(decadeInt);
+
+            // 2gram must be exactly 2 tokens
+            String[] wordsRaw = parts[0].trim().split("\\s+");
+            if (wordsRaw.length != 2) return;
+
+            String w1 = cleanToken(wordsRaw[0]);
+            String w2 = cleanToken(wordsRaw[1]);
+            if (w1 == null || w2 == null) return;
+
+            // StopWords check should be case-insensitive:
+            // we already lowercase in cleanToken, but do it anyway for safety.
+            if (stopWords.isStopWord(w1.toLowerCase(Locale.ROOT)) ||
+                stopWords.isStopWord(w2.toLowerCase(Locale.ROOT))) {
                 return;
             }
 
             long count;
             try {
-                count = Long.parseLong(countStr);
+                count = Long.parseLong(parts[2].trim());
             } catch (NumberFormatException e) {
                 return;
             }
-
-            int decadeInt = (year / 10) * 10;
-            String decade = Integer.toString(decadeInt);
-
-            // Must be exactly 2 words
-            String[] wordsRaw = gram.split("\\s+");
-            if (wordsRaw.length != 2) return;
-
-            String w1 = normalize(wordsRaw[0]);
-            String w2 = normalize(wordsRaw[1]);
-
-            // Like lecturer: only “clean” words survive
-            if (!isValidToken(w1) || !isValidToken(w2)) return;
-
-            // Stopwords after normalize
-            if (stopWords.isStopWord(w1) || stopWords.isStopWord(w2)) return;
 
             collocation outKey = new collocation(new Text(decade), new Text(w1), new Text(w2));
             context.write(outKey, new LongWritable(count));
         }
     }
 
-    // ===== Helpers =====
-
-    // ENGLISH ONLY:
-    // This removes ALL punctuation/quotes/dashes/etc anywhere in the token,
-    // not just at the ends.
-    private static String normalize(String w) {
-        w = w.toLowerCase(Locale.ROOT);
-        w = w.replaceAll("[^a-z]", ""); // keep letters only
-        return w;
-    }
-
-    private static boolean isValidToken(String w) {
-        return w.length() >= 2;
-        // If you want exactly like lecturer regex style:
-        // return w.length() >= 2 && w.matches("^[a-z]+$");
-    }
-
-    // ===== Reducer =====
-
     public static class job1Reducer extends Reducer<collocation, LongWritable, collocation, LongWritable> {
 
         @Override
-        protected void reduce(collocation key, Iterable<LongWritable> values, Context context)
+        public void reduce(collocation key, Iterable<LongWritable> counts, Context context)
                 throws IOException, InterruptedException {
 
             long sum = 0;
-            for (LongWritable v : values) {
-                sum += v.get();
+            for (LongWritable c : counts) {
+                sum += c.get();
             }
             context.write(key, new LongWritable(sum));
         }

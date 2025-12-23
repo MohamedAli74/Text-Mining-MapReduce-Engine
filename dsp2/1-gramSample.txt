@@ -1,9 +1,0 @@
-new	1996	4
-new	1996	2
-york	1995	3
-york	1996	2
-jersey	1995	1
-new	1997	1
-jersey	1997	1
-hello	1995	4
-world	1995	4
