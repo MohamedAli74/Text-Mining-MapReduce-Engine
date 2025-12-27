@@ -73,7 +73,7 @@ public class Main {
         System.out.println("useCombiner(Job1): " + useCombiner);
 
         // -------------------------
-        // Job 1 (BIGRAMS DATASET)  <-- SequenceFileInputFormat
+        // Job 1 (BIGRAMS DATASET) 
         // -------------------------
         Job j1 = Job.getInstance(conf, "job1 - build (decade,w1,w2)->c12");
         j1.setJarByClass(Main.class);
@@ -86,13 +86,11 @@ public class Main {
         if (useCombiner) {
             j1.setCombinerClass(job1.job1Reducer.class);
         }
-
         j1.setMapOutputKeyClass(collocation.class);
         j1.setMapOutputValueClass(LongWritable.class);
 
         j1.setOutputKeyClass(collocation.class);
         j1.setOutputValueClass(LongWritable.class);
-
         j1.setOutputFormatClass(SequenceFileOutputFormat.class);
         j1.setNumReduceTasks(reducers);
 
