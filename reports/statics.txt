@@ -1,0 +1,145 @@
+hebrow no combine 
+Job 1 (job_1766439945183_0001)
+Map input records    = 252069581
+Map output records   = 115557585
+Combine input records  = 0
+Combine output records = 0
+Reduce input records = 115557585
+Reduce output records= 43459919
+
+Job 2 (job_1766439945183_0002)
+Map input records    = 87860409
+Map output records   = 87509829
+Combine input records  = 0
+Combine output records = 0
+Reduce input records = 87509829
+Reduce output records= 26123709
+
+Job 3 (job_1766439945183_0003)
+Map input records    = 70524199
+Map output records   = 70173619
+Combine input records  = 0
+Combine output records = 0
+Reduce input records = 70173619
+Reduce output records= 26123709
+
+Job 4 (job_1766439945183_0004)
+Map input records    = 26123709
+Map output records   = 26123709
+Combine input records  = 0
+Combine output records = 0
+Reduce input records = 26123709
+Reduce output records= 3300
+
+
+----------------------------------------------------------
+hebrow with combine
+
+Run: job_1766439996421
+
+Job 1 (job_1766439996421_0001)
+Map input records      = 252069581
+Map output records     = 115557585
+Combine input records  = 115557585
+Combine output records = 43461332
+Reduce input records   = 43461332
+Reduce output records  = 43461308
+
+Job 2 (job_1766439996421_0002)
+Map input records      = 87861798
+Map output records     = 87511218
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 87511218
+Reduce output records  = 26123709
+
+Job 3 (job_1766439996421_0003)
+Map input records      = 70524199
+Map output records     = 70173619
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 70173619
+Reduce output records  = 26123709
+
+Job 4 (job_1766439996421_0004)
+Map input records      = 26123709
+Map output records     = 26123709
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 26123709
+Reduce output records  = 3300
+-------------------------------------------------------------------------
+
+eng with combine
+
+Run: job_1766446973396
+
+Job 1 (job_1766446973396_0001)
+Map input records      = 2000106933
+Map output records     = 632697402
+Combine input records  = 632697402
+Combine output records = 258284231
+Reduce input records   = 258284231
+Reduce output records  = 236685502
+
+Job 2 (job_1766446973396_0002)
+Map input records      = 425345961
+Map output records     = 407493465
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 407493465
+Reduce output records  = 145626692
+
+Job 3 (job_1766446973396_0003)
+Map input records      = 334287151
+Map output records     = 316434655
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 316434655
+Reduce output records  = 145626692
+
+Job 4 (job_1766446973396_0004)
+Map input records      = 145626692
+Map output records     = 145626692
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 145626692
+Reduce output records  = 4700
+-------------------------------------------------------------------------
+eng without combiner
+
+Run: job_1766447001123
+
+Job 1 
+Map input records      = 2000106933
+Map output records     = 632697402
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 632697402
+Reduce output records  = 236685502
+
+Job 2 
+Map input records      = 425345961
+Map output records     = 407493465
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 407493465
+Reduce output records  = 145626692
+
+Job 3
+Map input records      = 334287151
+Map output records     = 316434655
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 316434655
+Reduce output records  = 145626692
+
+Job 4 
+Map input records      = 145626692
+Map output records     = 145626692
+Combine input records  = 0
+Combine output records = 0
+Reduce input records   = 145626692
+Reduce output records  = 4700
+
+-------------------------------------------------------------------------

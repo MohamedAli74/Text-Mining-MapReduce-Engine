@@ -189,11 +189,11 @@ public class runaws {
 
 //how to run
 
-   /* java -jar target/runner-1.0.jar   s3://cfggii22/jars/dsp2.jar 
-  s3://datasets.elasticmapreduce/ngrams/books/20090715/eng-us-all/1gram/data  
-  
- s3://datasets.elasticmapreduce/ngrams/books/20090715/eng-us-all/2gram/data
-   s3://cfggii22/dsp2/output/eng_run1 
+   /* java -jar target/runner-1.0.jar   s3://cfggii22/dsp2/jars/dsp2.jar 
+    s3://cfggii22/dsp2/input/unigrams/ 
+     s3://cfggii22/dsp2/input/1-gramSammple.txt
+     s3://cfggii22/dsp2/input/2-gramSammple.txt
+   s3://cfggii22/dsp2/output/rund 
      2  (reducers number)
       2 (number of instances)
         0 (no combiner 1 with combiner)
